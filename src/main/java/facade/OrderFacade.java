@@ -7,12 +7,11 @@ package facade;
 
 import entities.OrderLine;
 import entities.Orders;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -49,7 +48,7 @@ public class OrderFacade {
     
     public static double getOrderSum(int orderID) throws EntityNotFoundException {
         EntityManager em = emf.createEntityManager();
-        Query query = em.createQuery("SELECT SUM(ol.product.price * ol.quantity) FROM Orders o JOIN o.orderlines ol WHERE o.id = :id", Orders.class);
+        TypedQuery query = em.createQuery("SELECT SUM(ol.product.price * ol.quantity) FROM Orders o JOIN o.orderlines ol WHERE o.id = :id", Orders.class);
         query.setParameter("id", orderID);
         double sum = (double) query.getSingleResult();
         return sum;

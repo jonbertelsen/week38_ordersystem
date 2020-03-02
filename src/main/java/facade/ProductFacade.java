@@ -11,7 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -45,7 +45,7 @@ public class ProductFacade {
     
     public static List<Product> getAllProducts(){
         EntityManager em = emf.createEntityManager();
-        Query query = em.createQuery("Select p from Product p");
+        TypedQuery query = em.createQuery("Select p from Product p", Product.class);
         List<Product> products = query.getResultList();
         em.close();         
         return products;

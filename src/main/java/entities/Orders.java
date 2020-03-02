@@ -8,13 +8,16 @@ package entities;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 
@@ -23,6 +26,7 @@ import javax.persistence.Temporal;
  * @author jobe
  */
 @Entity
+@NamedQuery(name = "Orders.deleteAllRows", query = "DELETE from Orders")
 public class Orders implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -90,7 +94,12 @@ public class Orders implements Serializable {
 
     public void addOrderline (OrderLine orderline) {
         this.orderlines.add(orderline);
-        orderline.setOrder(this);
+        orderline.setOrder(this); // update bidirectionality
+    }
+    
+    public void removeOrderLine(OrderLine orderline){
+        orderlines.remove(orderline);
+        orderline.setOrder(null);   
     }
     
 }

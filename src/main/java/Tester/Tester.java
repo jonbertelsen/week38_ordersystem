@@ -14,7 +14,10 @@ import facade.OrderFacade;
 import facade.OrderLineFacade;
 import facade.ProductFacade;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+import javax.persistence.Persistence;
 
 /**
  *
@@ -22,8 +25,20 @@ import javax.persistence.EntityNotFoundException;
  */
 public class Tester {
     
+    private static final EntityManagerFactory emf = Persistence.createEntityManagerFactory("pu");
+    
     public static void main(String[] args) {
         
+        EntityManager em = emf.createEntityManager();
+        
+        // Delete content in all tables
+        em.getTransaction().begin();
+            em.createNamedQuery("OrderLine.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Orders.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Customer.deleteAllRows").executeUpdate();
+            em.createNamedQuery("Product.deleteAllRows").executeUpdate();
+        em.getTransaction().commit();
+     
         // Create a Customer
         System.out.println("Create a customer ************");
         Customer cust = CustomerFacade.createCustomer("Jon", "jobe@cpbusiness.dk");
@@ -31,23 +46,27 @@ public class Tester {
         // Find a customer
         System.out.println("Find a customer ************");
         try {
-            CustomerFacade.findCustomerById(cust.getId());
+            cust = CustomerFacade.findCustomerById(cust.getId());
             System.out.println("Kunde med id = " + cust.getId() + " er fundet");
         } catch (EntityNotFoundException e){
-            System.out.println("Kunde med id = " + cust.getId() + " er findes ikke");
+            System.out.println("Kunde med id = " + cust.getId() + " findes ikke");
         }
         try {
-            CustomerFacade.findCustomerById(2);
-            System.out.println("Kunde med id = 2 er fundet");
+            cust = CustomerFacade.findCustomerById(1212);
+            System.out.println("Kunde med id = 1212 er fundet");
         } catch (EntityNotFoundException e){
-            System.out.println("Kunde med id = 2 findes ikke");
+            System.out.println("Kunde med id = 1212 findes ikke");
         }
-        
+       
         // Get all customers
         System.out.println("Get all customers ************");
-        List<Customer> customers = CustomerFacade.getAllCustomers();   
-        for(Customer c: customers){
-            System.out.printf("(%d,%s,%s)", c.getId(), c.getName(), c.getEmail());
+        List<Customer> customers = CustomerFacade.getAllCustomers();  
+        if (customers.size() > 0){
+            for(Customer c: customers){
+                System.out.printf("(%d,%s,%s)", c.getId(), c.getName(), c.getEmail());
+            }
+        } else {
+            System.out.println("Listen af kunder er tom");
         }
         
         // Create a Product
@@ -64,7 +83,7 @@ public class Tester {
             System.out.println("Product with id = " + p1.getId() + " is NOT found");
         }
         try {
-            ProductFacade.findProductById(12);
+            ProductFacade.findProductById(1212);
             System.out.println("Product with id = 12 is found");
         } catch (EntityNotFoundException e){
             System.out.println("Product with id = 12 is NOT found");
@@ -72,7 +91,8 @@ public class Tester {
         
         // Get all products
         System.out.println("Get all products ************");
-        List<Product> products = ProductFacade.getAllProducts();   
+        List<Product> products = ProductFacade.getAllProducts(); 
+        
         for(Product p: products){
             System.out.printf("(%d, %s, %s, %.2f)\n", p.getId(), p.getName(), p.getDescription(), p.getPrice());
         }
@@ -88,6 +108,9 @@ public class Tester {
         System.out.printf("(%d,%s,%s, orderid: %d)\n", 
                 c1.getId(), c1.getName(), c1.getEmail(), 
                 c1.getOrders().get(0).getId());
+         System.out.printf("(%d,%s,%s, orderid: %d)\n", 
+                c2.getId(), c2.getName(), c2.getEmail(), 
+                c2.getOrders().get(0).getId());
         
         // Create an orderline
         System.out.println("Add an orderline ************");
@@ -105,6 +128,7 @@ public class Tester {
             List<Orders> allOrders = CustomerFacade.getAllOrdersByCustomerID(custObj.getId());
             for (Orders orderObj: allOrders){
                 System.out.printf("(OrderID: %d, Customer: %s)\n",orderObj.getId(), orderObj.getCustomer().getName());
+                
                 for (OrderLine olObj: orderObj.getOrderlines()){
                     System.out.printf("--- (Quantity: %d pcs of %s\n", 
                             olObj.getQuantity(), olObj.getProduct().getName());

@@ -12,7 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 /**
  *
@@ -46,8 +46,8 @@ public class CustomerFacade {
     
     public static List<Customer> getAllCustomers(){
         EntityManager em = emf.createEntityManager();
-        Query query = em.createQuery("Select c from Customer c");
-        List<Customer> customers =query.getResultList();
+        TypedQuery query = em.createQuery("Select c from Customer c", Customer.class);
+        List<Customer> customers = query.getResultList();
         em.close();         
         return customers;
     }
@@ -67,7 +67,7 @@ public class CustomerFacade {
    
    public static List<Orders> getAllOrdersByCustomerID(int customerID) throws EntityNotFoundException {
         EntityManager em = emf.createEntityManager();
-        Query query = em.createQuery("SELECT o FROM Orders o JOIN o.customer c WHERE o.customer.id = :id", Orders.class);
+        TypedQuery query = em.createQuery("SELECT o FROM Orders o JOIN o.customer c WHERE o.customer.id = :id", Orders.class);
         query.setParameter("id", customerID);
         
         List<Orders> orders = query.getResultList();

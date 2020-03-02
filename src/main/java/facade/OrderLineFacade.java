@@ -5,7 +5,6 @@
  */
 package facade;
 
-import entities.Customer;
 import entities.OrderLine;
 import entities.Product;
 import javax.persistence.EntityManager;
